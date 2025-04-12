@@ -1,29 +1,29 @@
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import * as THREE from 'three';
+import { useGLTF } from '@react-three/drei';
 import { useTelemetryStore } from '../hooks/useWebSocketTelemetry';
 
 const Skateboard = () => {
-    const meshRef = useRef<THREE.Mesh>(null!);
+    const group = useRef<THREE.Group>(null!);
     const { rotation } = useTelemetryStore();
 
+    // Load the glTF model
+    const { scene } = useGLTF('/skateboard/scene.gltf');
+
     useFrame(() => {
-        // Convert DeviceMotion rotation (ZXY) to Three.js Euler
         const euler = new THREE.Euler(
-            rotation.y,  // pitch (beta → X)
-            rotation.z,  // roll (gamma → Y)
-            rotation.x,  // yaw (alpha → Z)
-            'ZXY'        // DeviceMotion uses ZXY
+            rotation.y, // pitch (beta → X)
+            rotation.z, // roll (gamma → Y)
+            rotation.x, // yaw (alpha → Z)
+            'ZXY'
         );
 
-        meshRef.current.setRotationFromEuler(euler);
+        group.current.setRotationFromEuler(euler);
     });
 
     return (
-        <mesh ref={meshRef}>
-            <boxGeometry args={[3, 0.1, 0.8]} />
-            <meshStandardMaterial color="orange" />
-        </mesh>
+        <primitive ref={group} object={scene} scale={1} />
     );
 };
 
