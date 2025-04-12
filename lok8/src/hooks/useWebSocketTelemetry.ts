@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { create } from 'zustand';
 
 export type Vec3 = { x: number; y: number; z: number };
@@ -30,9 +30,11 @@ export const useTelemetryStore = create<TelemetryStore>((set) => ({
 
 export const useWebSocketTelemetry = (url: string) => {
   const setTelemetry = useTelemetryStore((s) => s.setTelemetry);
+  const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     const socket = new WebSocket(url);
+    socketRef.current = socket;
 
     socket.onmessage = (event) => {
       try {
@@ -55,6 +57,19 @@ export const useWebSocketTelemetry = (url: string) => {
     socket.onerror = (err) => console.warn("WebSocket error:", err);
     socket.onclose = () => console.warn("WebSocket closed");
 
-    return () => socket.close();
+    return () => {
+      socket.close();
+      socketRef.current = null;
+    };
   }, [url]);
+
+  const sendMessage = (message: any) => {
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify(message));
+    } else {
+      console.warn("WebSocket is not open. Unable to send message.");
+    }
+  };
+
+  return { sendMessage };
 };
