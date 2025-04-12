@@ -6,14 +6,22 @@ import { OrbitControls, Environment } from '@react-three/drei';
 import { useWebSocketTelemetry } from '../hooks/useWebSocketTelemetry';
 import Landing from '@/components/landing';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 const Skateboard = dynamic(() => import('@/components/skateboard'), { ssr: false });
 
 export default function Home() {
   const { sendMessage } = useWebSocketTelemetry("ws://localhost:8000/ws/viewer");
+  const [activeButton, setActiveButton] = useState<string | null>(null);
 
-  const handleSendMessage = () => {
-    sendMessage({ type: "TOGGLE_TRACKING" });
+  const handleSendMessage = (trick: string) => {
+    if (activeButton === trick) {
+      sendMessage({ type: "stop" });
+      setActiveButton(null);
+    } else {
+      sendMessage({ type: trick });
+      setActiveButton(trick);
+    }
   };
 
   return (
@@ -28,14 +36,28 @@ export default function Home() {
           <OrbitControls />
           <Environment preset="sunset" />
         </Canvas>
-        <Button 
-          onClick={handleSendMessage} 
+        <Button
+          onClick={() => handleSendMessage("ollie")}
+          disabled={activeButton !== null && activeButton !== "ollie"}
           style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}
         >
-          Send Message
+          Ollie
+        </Button>
+        <Button
+          onClick={() => handleSendMessage("kickflip")}
+          disabled={activeButton !== null && activeButton !== "kickflip"}
+          style={{ position: 'absolute', top: '50px', right: '10px', zIndex: 10 }}
+        >
+          Kickflip
+        </Button>
+        <Button
+          onClick={() => handleSendMessage("shuvit")}
+          disabled={activeButton !== null && activeButton !== "shuvit"}
+          style={{ position: 'absolute', top: '90px', right: '10px', zIndex: 10 }}
+        >
+          Shuvit
         </Button>
       </div>
-
     </>
   );
 }

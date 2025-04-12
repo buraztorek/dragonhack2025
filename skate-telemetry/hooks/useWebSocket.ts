@@ -1,7 +1,7 @@
 import { TelemetryData } from '@/types/telemetry';
 import { useEffect, useRef } from 'react';
 
-export const useWebSocket = (tracking: boolean, latestData: TelemetryData, onToggle: () => void) => {
+export const useWebSocket = (tracking: boolean, latestData: TelemetryData, onToggle: (message: string) => void) => {
   const socketRef = useRef<WebSocket | null>(null);
 
   // Connect once when component mounts
@@ -17,7 +17,7 @@ export const useWebSocket = (tracking: boolean, latestData: TelemetryData, onTog
       try {
         const message = JSON.parse(event.data);
         if (message.type === "TOGGLE_TRACKING") {
-          onToggle();
+          onToggle(message.message);
         }
       } catch (e) {
         console.warn("Invalid message received:", e);
@@ -40,6 +40,7 @@ export const useWebSocket = (tracking: boolean, latestData: TelemetryData, onTog
   // Send telemetry only when tracking is enabled
   useEffect(() => {
     if (tracking && socketRef.current?.readyState === WebSocket.OPEN) {
+      console.log("Sending telemetry data:", latestData);
       socketRef.current.send(JSON.stringify(latestData));
     }
   }, [latestData, tracking]);

@@ -27,7 +27,7 @@ import { useState, useEffect } from 'react';
 import { TelemetryData } from '@/types/telemetry';
 import { Accelerometer, Gyroscope, Magnetometer } from 'expo-sensors';
 
-export const useTelemetry = (isTracking: boolean): TelemetryData => {
+export const useTelemetry = (isTracking: boolean, trick: string): TelemetryData => {
     const [accelerometer, setAccelerometer] = useState({ x: 0, y: 0, z: 0 });
     const [gyroscope, setGyroscope] = useState({ x: 0, y: 0, z: 0 });
     const [magnetometer, setMagnetometer] = useState({ x: 0, y: 0, z: 0 });
@@ -70,5 +70,6 @@ export const useTelemetry = (isTracking: boolean): TelemetryData => {
         magnetometer,
         rotation,
         timestamp,
+        trick,
     };
 }

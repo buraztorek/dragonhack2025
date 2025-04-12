@@ -4,4 +4,5 @@ export interface TelemetryData {
     magnetometer: { x: number; y: number; z: number };
     rotation: { alpha: number; beta: number; gamma: number };
     timestamp: number;
+    trick: string;
 }

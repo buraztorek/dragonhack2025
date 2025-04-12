@@ -6,9 +6,12 @@ import { Button, Text, View, StyleSheet } from "react-native";
 
 export default function Index() {
   const [tracking, setTracking] = useState(false);
-  const telemetry = useTelemetry(tracking);
+  const [trick, setTrick] = useState("stop");
+  const telemetry = useTelemetry(tracking, trick);
 
-  useWebSocket(tracking, telemetry, () => {
+  useWebSocket(tracking, telemetry, (message) => {
+    setTrick(message);
+    console.log("Received message:", message);
     setTracking(prev => !prev); // Toggled by server
   });
 

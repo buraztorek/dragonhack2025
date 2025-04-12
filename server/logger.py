@@ -7,21 +7,26 @@ LOG_DIR = "logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 log_lock = asyncio.Lock()
 
-async def log_telemetry(data: dict):
-    data["received_at"] = datetime.utcnow().isoformat()
-    session_id = data.get("session_id", "default_session")
-    global current_session_id, current_timestamp
-    if "current_session_id" not in globals():
-        current_session_id = None
-        current_timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+# Track state between calls
+current_session_id = None
+current_timestamp = None
 
+async def log_telemetry(data: dict):
+    print(f"Logging telemetry data: {data}")
+    data["received_at"] = datetime.utcnow().isoformat()
+    session_id = data.get("session_id", "default")
+
+    global current_session_id, current_timestamp
+
+    # Start new file if session/trick changes
     if session_id != current_session_id:
         current_session_id = session_id
         current_timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
 
-
-    log_file = os.path.join(LOG_DIR, f"{current_timestamp}.jsonl")
+    # Save file as {trick_name}_{timestamp}.jsonl
+    log_file = os.path.join(LOG_DIR, f"{session_id}_{current_timestamp}.jsonl")
     line = json.dumps(data) + "\n"
+
     async with log_lock:
         await asyncio.to_thread(_write_line, log_file, line)
 

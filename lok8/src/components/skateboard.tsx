@@ -17,8 +17,8 @@ const Skateboard = () => {
 
     useFrame(() => {
         const euler = new THREE.Euler(
-            rotation.y,        // yaw
-            rotation.x + 1.7,       // roll (flipped for better alignment)
+            rotation.y+ Math.PI,        // yaw
+            rotation.x ,       // roll (flipped for better alignment)
             -rotation.z,        // pitch
             'YXZ'
         );
