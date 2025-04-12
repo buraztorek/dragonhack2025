@@ -1,15 +1,22 @@
-import { Text, View } from "react-native";
+import TelemetryDisplay from "@/components/TelemetryDisplay";
+import { useTelemetry } from "@/hooks/useTelemetry";
+import { useState } from "react";
+import { Button, Text, View, StyleSheet } from "react-native";
 
 export default function Index() {
+  const [tracking, setTracking] = useState(false);
+  const telemetry = useTelemetry(tracking);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>🛹 Skate Tracker Pro</Text>
+      <Button title={tracking ? "Stop" : "Start Tracking"} onPress={() => setTracking(prev => !prev)} />
+      <TelemetryDisplay telemetry={telemetry} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 }
+});
