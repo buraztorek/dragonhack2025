@@ -19,9 +19,8 @@ export default function Home() {
   return (
     <>
       {/* <Landing /> */}
-      <Button onClick={handleSendMessage}>Send Message</Button>
 
-      {/* <div style={{ width: '100vw', height: '100vh', background: '#000' }}>
+      <div style={{ width: '100vw', height: '100vh', background: '#000', position: 'relative' }}>
         <Canvas camera={{ position: [5, 3, 5], fov: 60 }}>
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
@@ -29,7 +28,13 @@ export default function Home() {
           <OrbitControls />
           <Environment preset="sunset" />
         </Canvas>
-      </div>  */}
+        <Button 
+          onClick={handleSendMessage} 
+          style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}
+        >
+          Send Message
+        </Button>
+      </div>
 
     </>
   );
