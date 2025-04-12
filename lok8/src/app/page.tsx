@@ -5,6 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import { useWebSocketTelemetry } from '../hooks/useWebSocketTelemetry';
 import Landing from '@/components/landing';
+import { Button } from '@/components/ui/button';
 
 const Skateboard = dynamic(() => import('@/components/skateboard'), { ssr: false });
 
@@ -18,9 +19,9 @@ export default function Home() {
   return (
     <>
       {/* <Landing /> */}
-      <button onClick={handleSendMessage}>Send Message</button>
+      <Button onClick={handleSendMessage}>Send Message</Button>
       
-      <div style={{ width: '100vw', height: '100vh', background: '#000' }}>
+      {/* <div style={{ width: '100vw', height: '100vh', background: '#000' }}>
         <Canvas camera={{ position: [5, 3, 5], fov: 60 }}>
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
@@ -28,7 +29,7 @@ export default function Home() {
           <OrbitControls />
           <Environment preset="sunset" />
         </Canvas>
-      </div> 
+      </div>  */}
      
     </>
   );
