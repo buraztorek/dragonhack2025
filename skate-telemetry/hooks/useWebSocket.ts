@@ -1,12 +1,13 @@
+import { TelemetryData } from '@/types/telemetry';
 import { useEffect, useRef } from 'react';
 
-export const useWebSocket = (enabled: boolean, latestData: object | null) => {
+export const useWebSocket = (enabled: boolean, latestData: TelemetryData) => {
     const socketRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
         if (!enabled) return;
 
-        const socket = new WebSocket("ws://10.32.250.150:8000/ws");
+        const socket = new WebSocket("ws://10.32.250.150:8000/ws/telemetry");
         socketRef.current = socket;
 
         socket.onopen = () => {

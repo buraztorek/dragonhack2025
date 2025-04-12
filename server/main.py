@@ -1,26 +1,40 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-import json
-from datetime import datetime
-import os
+from logger import log_telemetry
+from broadcaster import add_client, remove_client, broadcast
 
 app = FastAPI()
-LOG_DIR = "logs"
-os.makedirs(LOG_DIR, exist_ok=True)
-LOG_FILE = os.path.join(LOG_DIR, "telemetry_ws_log.jsonl")
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+@app.websocket("/ws/telemetry")
+async def telemetry_stream(websocket: WebSocket):
     await websocket.accept()
-    print("📡 Client connected")
+    print("📱 Telemetry device connected")
 
     try:
         while True:
-            raw_data = await websocket.receive_text()
-            data = json.loads(raw_data)
-            data["received_at"] = datetime.utcnow().isoformat()
+            raw = await websocket.receive_text()
+            try:
+                import json
+                data = json.loads(raw)
 
-            with open(LOG_FILE, "a") as f:
-                f.write(json.dumps(data) + "\n")
+                # Log + Broadcast
+                await log_telemetry(data)
+                await broadcast(data)
+
+            except Exception as e:
+                print("❌ Error parsing telemetry:", e)
 
     except WebSocketDisconnect:
-        print("❌ Client disconnected")
+        print("📴 Telemetry disconnected")
+
+@app.websocket("/ws/viewer")
+async def viewer_stream(websocket: WebSocket):
+    await websocket.accept()
+    print("🖥️ Viewer connected")
+    add_client(websocket)
+
+    try:
+        while True:
+            await websocket.receive_text()  # optional: keep-alive
+    except WebSocketDisconnect:
+        remove_client(websocket)
+        print("📴 Viewer disconnected")

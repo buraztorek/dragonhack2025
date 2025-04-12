@@ -14,13 +14,13 @@ const TelemetryDisplay: React.FC<TelemetryDisplayProps> = ({ telemetry }) => {
             {telemetry ? (
                 <>
                     <Text style={styles.label}>Acceleration (x/y/z):</Text>
-                    <Text>{`${telemetry.acceleration.x?.toFixed(2)}, ${telemetry.acceleration.y?.toFixed(2)}, ${telemetry.acceleration.z?.toFixed(2)}`}</Text>
+                    <Text>{`${telemetry.accelerometer.x.toFixed(2)}, ${telemetry.accelerometer.y.toFixed(2)}, ${telemetry.accelerometer.z.toFixed(2)}`}</Text>
 
-                    <Text style={styles.label}>Rotation Rate (α/β/γ):</Text>
-                    <Text>{`${telemetry.rotationRate.alpha?.toFixed(2)}, ${telemetry.rotationRate.beta?.toFixed(2)}, ${telemetry.rotationRate.gamma?.toFixed(2)}`}</Text>
+                    <Text style={styles.label}>Angular Velocity (x/y/z):</Text>
+                    <Text>{`${telemetry.gyroscope.x.toFixed(2)}, ${telemetry.gyroscope.y.toFixed(2)}, ${telemetry.gyroscope.z.toFixed(2)}`}</Text>
 
-                    <Text style={styles.label}>Orientation:</Text>
-                    <Text>{telemetry.orientation}</Text>
+                    <Text style={styles.label}>Magnetic Field (x/y/z):</Text>
+                    <Text>{`${telemetry.magnetometer.x.toFixed(2)}, ${telemetry.magnetometer.y.toFixed(2)}, ${telemetry.magnetometer.z.toFixed(2)}`}</Text>
                 </>
             ) : (
                 <Text>No telemetry data</Text>
