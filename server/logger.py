@@ -20,7 +20,7 @@ async def log_telemetry(data: dict):
         current_timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
 
 
-    log_file = os.path.join(LOG_DIR, f"{current_session_id}_{current_timestamp}.jsonl")
+    log_file = os.path.join(LOG_DIR, f"{current_timestamp}.jsonl")
     line = json.dumps(data) + "\n"
     async with log_lock:
         await asyncio.to_thread(_write_line, log_file, line)
