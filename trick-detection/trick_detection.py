@@ -1,4 +1,5 @@
 import json
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -33,8 +34,11 @@ def read_rotation_to_dataframe(filepath):
 # === Run the reader ===
 if __name__ == "__main__":
 	# Replace with the path to your JSON file
-	json_file_path = "./trick-detection/Data/3f498b3b-e3b0-45e8-a402-614fabda483a.jsonl"
-	data = read_rotation_to_dataframe(json_file_path)
+	json_dir = "./server/logs/"
+	print(os.listdir("."))
+	json_file = "c581e35f-8784-4fa7-8ef4-c2ed2ca719d8_20250412_191520.jsonl"
+	json_file = "cab865bc-b66c-4902-acc0-bcbc33db20f4_20250412_191515.jsonl"
+	data = read_rotation_to_dataframe(json_dir + json_file)
 
 
 	plt.figure(figsize=(10, 5))
@@ -43,7 +47,7 @@ if __name__ == "__main__":
 	plt.plot(data['timestamp'], data['rotation_z'], label='Rotation Z', color='g')
 	plt.xlabel('Timestamp')
 	plt.ylabel('Rotation (degrees)')
-	plt.title('Rotation X over Time')
+	plt.title('Rotation over Time')
 	plt.legend()
 	plt.grid()
 	plt.show()

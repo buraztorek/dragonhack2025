@@ -1,3 +1,4 @@
 .env
 venv
 trick-detection/Data
+node_modules

@@ -10,7 +10,17 @@ log_lock = asyncio.Lock()
 async def log_telemetry(data: dict):
     data["received_at"] = datetime.utcnow().isoformat()
     session_id = data.get("session_id", "default_session")
-    log_file = os.path.join(LOG_DIR, f"{session_id}.jsonl")
+    global current_session_id, current_timestamp
+    if "current_session_id" not in globals():
+        current_session_id = None
+        current_timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+
+    if session_id != current_session_id:
+        current_session_id = session_id
+        current_timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+
+
+    log_file = os.path.join(LOG_DIR, f"{current_timestamp}.jsonl")
     line = json.dumps(data) + "\n"
     async with log_lock:
         await asyncio.to_thread(_write_line, log_file, line)
