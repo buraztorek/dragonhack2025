@@ -65,7 +65,10 @@ async def viewer_stream(websocket: WebSocket):
 
     try:
         while True:
-            await websocket.receive_text()  # optional: keep-alive
+            message = await websocket.receive_text()  # Receive data from viewer
+            print(f"📩 Data received from viewer: {message}")  # Display received data
+            
     except WebSocketDisconnect:
         remove_client(websocket)
         print("📴 Viewer disconnected")
+
