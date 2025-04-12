@@ -1,11 +1,14 @@
 import TelemetryDisplay from "@/components/TelemetryDisplay";
 import { useTelemetry } from "@/hooks/useTelemetry";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { useState } from "react";
 import { Button, Text, View, StyleSheet } from "react-native";
 
 export default function Index() {
   const [tracking, setTracking] = useState(false);
   const telemetry = useTelemetry(tracking);
+
+  useWebSocket(tracking, telemetry);
 
   return (
     <View style={styles.container}>
