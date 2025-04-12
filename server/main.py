@@ -3,21 +3,21 @@ import json
 import uuid
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from logger import log_telemetry
-from broadcaster import add_client, remove_client, broadcast
+from broadcaster import (
+    add_client,
+    remove_client,
+    broadcast_to_viewers,
+    broadcast_to_telemetry
+)
 
 app = FastAPI()
-
-latest_frame = {
-    "accelerometer": None,
-    "gyroscope": None,
-    "magnetometer": None,
-}
 
 
 @app.websocket("/ws/telemetry")
 async def telemetry_stream(websocket: WebSocket):
     await websocket.accept()
-    session_id = str(uuid.uuid4())  # Generate a unique session ID
+    add_client(websocket, "telemetry")
+    session_id = str(uuid.uuid4())
     print(f"📱 Telemetry device connected (Session ID: {session_id})")
 
     try:
@@ -26,49 +26,50 @@ async def telemetry_stream(websocket: WebSocket):
             try:
                 data = json.loads(raw)
 
-                # Ensure all expected keys are present
                 if not all(k in data for k in ["accelerometer", "gyroscope", "magnetometer", "rotation"]):
                     print(f"⚠️ Incomplete telemetry data (Session ID: {session_id}), skipping...")
                     continue
 
-                # Construct a fused frame using the actual rotation from the phone
                 fused = {
-                    "session_id": session_id,  # Include session ID in the data
+                    "session_id": session_id,
                     "timestamp": data.get("timestamp", datetime.utcnow().timestamp()),
                     "rotation": {
-                        "x": data["rotation"]["alpha"],  # yaw
-                        "y": data["rotation"]["beta"],   # pitch
-                        "z": data["rotation"]["gamma"],  # roll
+                        "x": data["rotation"]["alpha"],
+                        "y": data["rotation"]["beta"],
+                        "z": data["rotation"]["gamma"],
                     },
                     "acceleration": data["accelerometer"],
                     "gyroscope": data["gyroscope"],
                     "magneticField": data["magnetometer"]
                 }
 
-                # Log it
                 await log_telemetry(fused)
 
-                # Broadcast to all viewers
-                await broadcast(fused)
+                # Send telemetry data only to viewer clients
+                await broadcast_to_viewers(fused)
 
             except Exception as e:
                 print(f"❌ Error processing telemetry (Session ID: {session_id}):", e)
 
     except WebSocketDisconnect:
+        remove_client(websocket)
         print(f"📴 Telemetry disconnected (Session ID: {session_id})")
+
 
 @app.websocket("/ws/viewer")
 async def viewer_stream(websocket: WebSocket):
     await websocket.accept()
     print("🖥️ Viewer connected")
-    add_client(websocket)
+    add_client(websocket, "viewer")
 
     try:
         while True:
-            message = await websocket.receive_text()  # Receive data from viewer
-            print(f"📩 Data received from viewer: {message}")  # Display received data
-            
+            message = await websocket.receive_text()
+            print(f"📩 Data received from viewer: {message}")
+
+            # Optionally send to telemetry devices
+            await broadcast_to_telemetry({"type": "TOGGLE_TRACKING", "message": message})
+
     except WebSocketDisconnect:
         remove_client(websocket)
         print("📴 Viewer disconnected")
-

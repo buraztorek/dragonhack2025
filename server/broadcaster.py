@@ -1,25 +1,34 @@
-import json
-from typing import List
 from fastapi import WebSocket
 
-connected_clients: List[WebSocket] = []
+telemetry_clients = set()
+viewer_clients = set()
 
-def add_client(client: WebSocket):
-    connected_clients.append(client)
+def add_client(websocket: WebSocket, client_type: str):
+    if client_type == "telemetry":
+        telemetry_clients.add(websocket)
+    elif client_type == "viewer":
+        viewer_clients.add(websocket)
 
-def remove_client(client: WebSocket):
-    if client in connected_clients:
-        connected_clients.remove(client)
+def remove_client(websocket: WebSocket):
+    telemetry_clients.discard(websocket)
+    viewer_clients.discard(websocket)
 
-async def broadcast(data: dict):
-    message = json.dumps(data)
-    dead_clients = []
-
-    for client in connected_clients:
+async def broadcast_to_viewers(message: dict):
+    disconnected = []
+    for client in viewer_clients:
         try:
-            await client.send_text(message)
+            await client.send_json(message)
         except:
-            dead_clients.append(client)
+            disconnected.append(client)
+    for client in disconnected:
+        viewer_clients.discard(client)
 
-    for dead in dead_clients:
-        remove_client(dead)
+async def broadcast_to_telemetry(message: dict):
+    disconnected = []
+    for client in telemetry_clients:
+        try:
+            await client.send_json(message)
+        except:
+            disconnected.append(client)
+    for client in disconnected:
+        telemetry_clients.discard(client)

@@ -8,7 +8,9 @@ export default function Index() {
   const [tracking, setTracking] = useState(false);
   const telemetry = useTelemetry(tracking);
 
-  useWebSocket(tracking, telemetry);
+  useWebSocket(tracking, telemetry, () => {
+    setTracking(prev => !prev); // Toggled by server
+  });
 
   return (
     <View style={styles.container}>

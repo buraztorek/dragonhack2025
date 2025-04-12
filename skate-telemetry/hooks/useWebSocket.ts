@@ -1,36 +1,46 @@
 import { TelemetryData } from '@/types/telemetry';
 import { useEffect, useRef } from 'react';
 
-export const useWebSocket = (enabled: boolean, latestData: TelemetryData) => {
-    const socketRef = useRef<WebSocket | null>(null);
+export const useWebSocket = (tracking: boolean, latestData: TelemetryData, onToggle: () => void) => {
+  const socketRef = useRef<WebSocket | null>(null);
 
-    useEffect(() => {
-        if (!enabled) return;
+  // Connect once when component mounts
+  useEffect(() => {
+    const socket = new WebSocket("ws://10.32.250.150:8000/ws/telemetry");
+    socketRef.current = socket;
 
-        const socket = new WebSocket("ws://10.32.250.150:8000/ws/telemetry");
-        socketRef.current = socket;
+    socket.onopen = () => {
+      console.log("✅ WebSocket connected");
+    };
 
-        socket.onopen = () => {
-            console.log("✅ WebSocket connected");
-        };
-
-        socket.onerror = (e) => {
-            console.warn("WebSocket error:", e);
-        };
-
-        socket.onclose = () => {
-            console.log("❌ WebSocket disconnected");
-        };
-
-        return () => {
-            socket.close();
-        };
-    }, [enabled]);
-
-    // Send data when it changes
-    useEffect(() => {
-        if (enabled && socketRef.current?.readyState === WebSocket.OPEN) {
-            socketRef.current.send(JSON.stringify(latestData));
+    socket.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === "TOGGLE_TRACKING") {
+          onToggle();
         }
-    }, [latestData, enabled]);
+      } catch (e) {
+        console.warn("Invalid message received:", e);
+      }
+    };
+
+    socket.onerror = (e) => {
+      console.warn("WebSocket error:", e);
+    };
+
+    socket.onclose = () => {
+      console.log("❌ WebSocket disconnected");
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
+  // Send telemetry only when tracking is enabled
+  useEffect(() => {
+    if (tracking && socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify(latestData));
+    }
+  }, [latestData, tracking]);
 };

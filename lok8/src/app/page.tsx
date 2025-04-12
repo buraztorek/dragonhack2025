@@ -13,14 +13,14 @@ export default function Home() {
   const { sendMessage } = useWebSocketTelemetry("ws://localhost:8000/ws/viewer");
 
   const handleSendMessage = () => {
-    sendMessage("Hello from the client!");
+    sendMessage({ type: "TOGGLE_TRACKING" });
   };
 
   return (
     <>
       {/* <Landing /> */}
       <Button onClick={handleSendMessage}>Send Message</Button>
-      
+
       {/* <div style={{ width: '100vw', height: '100vh', background: '#000' }}>
         <Canvas camera={{ position: [5, 3, 5], fov: 60 }}>
           <ambientLight intensity={0.5} />
@@ -30,7 +30,7 @@ export default function Home() {
           <Environment preset="sunset" />
         </Canvas>
       </div>  */}
-     
+
     </>
   );
 }
