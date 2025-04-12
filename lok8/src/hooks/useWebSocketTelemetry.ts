@@ -4,13 +4,15 @@ import { create } from 'zustand';
 export type Vec3 = { x: number; y: number; z: number };
 
 interface TelemetryStore {
-  rotation: Vec3;         // from gyroscope
-  acceleration: Vec3;     // from accelerometer
-  magneticField: Vec3;    // from magnetometer
+  rotation: Vec3;
+  acceleration: Vec3;
+  gyroscope: Vec3;
+  magneticField: Vec3;
   timestamp: number;
   setTelemetry: (payload: {
     rotation: Vec3;
     acceleration: Vec3;
+    gyroscope: Vec3;
     magneticField: Vec3;
     timestamp: number;
   }) => void;
@@ -19,10 +21,11 @@ interface TelemetryStore {
 export const useTelemetryStore = create<TelemetryStore>((set) => ({
   rotation: { x: 0, y: 0, z: 0 },
   acceleration: { x: 0, y: 0, z: 0 },
+  gyroscope: { x: 0, y: 0, z: 0 },
   magneticField: { x: 0, y: 0, z: 0 },
   timestamp: 0,
-  setTelemetry: ({ rotation, acceleration, magneticField, timestamp }) =>
-    set({ rotation, acceleration, magneticField, timestamp }),
+  setTelemetry: ({ rotation, acceleration, gyroscope, magneticField, timestamp }) =>
+    set({ rotation, acceleration, gyroscope, magneticField, timestamp }),
 }));
 
 export const useWebSocketTelemetry = (url: string) => {
@@ -34,10 +37,12 @@ export const useWebSocketTelemetry = (url: string) => {
     socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.rotation && data.acceleration && data.magneticField) {
+
+        if (data.rotation && data.acceleration && data.gyroscope && data.magneticField) {
           setTelemetry({
             rotation: data.rotation,
             acceleration: data.acceleration,
+            gyroscope: data.gyroscope,
             magneticField: data.magneticField,
             timestamp: data.timestamp,
           });

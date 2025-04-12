@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "skate-telemetry",
-        "server"
+        "server",
+        "lok8"
     ]
 }

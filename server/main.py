@@ -24,45 +24,36 @@ async def telemetry_stream(websocket: WebSocket):
             try:
                 data = json.loads(raw)
 
-                # Update latest values
-                for key in ["accelerometer", "gyroscope", "magnetometer"]:
-                    if key in data:
-                        latest_frame[key] = data[key]
+                # Ensure all expected keys are present
+                if not all(k in data for k in ["accelerometer", "gyroscope", "magnetometer", "rotation"]):
+                    print("⚠️ Incomplete telemetry data, skipping...")
+                    continue
 
-                # Only send if all sensors have data
-                if all(latest_frame.values()):
-                    # Construct a fused frame
-                    fused = {
-                        "timestamp": datetime.utcnow().timestamp(),
-                        "rotation": {
-                            # Use gyro data as rotationRate (in rad/s)
-                            "x": latest_frame["gyroscope"]["x"],
-                            "y": latest_frame["gyroscope"]["y"],
-                            "z": latest_frame["gyroscope"]["z"],
-                        },
-                        "acceleration": {
-                            "x": latest_frame["accelerometer"]["x"],
-                            "y": latest_frame["accelerometer"]["y"],
-                            "z": latest_frame["accelerometer"]["z"],
-                        },
-                        "magneticField": {
-                            "x": latest_frame["magnetometer"]["x"],
-                            "y": latest_frame["magnetometer"]["y"],
-                            "z": latest_frame["magnetometer"]["z"],
-                        },
-                    }
+                # Construct a fused frame using the actual rotation from the phone
+                fused = {
+                    "timestamp": data.get("timestamp", datetime.utcnow().timestamp()),
+                    "rotation": {
+                        "x": data["rotation"]["alpha"],  # yaw
+                        "y": data["rotation"]["beta"],   # pitch
+                        "z": data["rotation"]["gamma"],  # roll
+                    },
+                    "acceleration": data["accelerometer"],
+                    "gyroscope": data["gyroscope"],
+                    "magneticField": data["magnetometer"]
+                }
 
-                    # Log it
-                    await log_telemetry(fused)
+                # Log it
+                await log_telemetry(fused)
 
-                    # Send to viewers
-                    await broadcast(fused)
+                # Broadcast to all viewers
+                await broadcast(fused)
 
             except Exception as e:
                 print("❌ Error processing telemetry:", e)
 
     except WebSocketDisconnect:
         print("📴 Telemetry disconnected")
+
 
 
 @app.websocket("/ws/viewer")

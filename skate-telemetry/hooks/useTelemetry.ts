@@ -1,4 +1,4 @@
-// import { DeviceMotion, DeviceMotionMeasurement } from 'expo-sensors';
+import { DeviceMotion, DeviceMotionMeasurement } from 'expo-sensors';
 
 // export const useTelemetry = (isTracking: boolean) => {
 //     const [motionData, setMotionData] = useState<TelemetryData | null>(null);
@@ -31,6 +31,8 @@ export const useTelemetry = (isTracking: boolean): TelemetryData => {
     const [accelerometer, setAccelerometer] = useState({ x: 0, y: 0, z: 0 });
     const [gyroscope, setGyroscope] = useState({ x: 0, y: 0, z: 0 });
     const [magnetometer, setMagnetometer] = useState({ x: 0, y: 0, z: 0 });
+    const [rotation, setRotation] = useState({ alpha: 0, beta: 0, gamma: 0 });
+    const [timestamp, setTimestamp] = useState<number>(Date.now());
 
     useEffect(() => {
         if (!isTracking) return;
@@ -38,15 +40,27 @@ export const useTelemetry = (isTracking: boolean): TelemetryData => {
         Accelerometer.setUpdateInterval(100);
         Gyroscope.setUpdateInterval(100);
         Magnetometer.setUpdateInterval(100);
+        DeviceMotion.setUpdateInterval(100);
 
         const accelSub = Accelerometer.addListener(setAccelerometer);
         const gyroSub = Gyroscope.addListener(setGyroscope);
         const magSub = Magnetometer.addListener(setMagnetometer);
+        const motionSub = DeviceMotion.addListener((motion: DeviceMotionMeasurement) => {
+            if (motion.rotation) {
+                setRotation({
+                    alpha: motion.rotation.alpha,
+                    beta: motion.rotation.beta,
+                    gamma: motion.rotation.gamma,
+                });
+                setTimestamp(Date.now());
+            }
+        });
 
         return () => {
-            accelSub?.remove();
-            gyroSub?.remove();
-            magSub?.remove();
+            accelSub.remove();
+            gyroSub.remove();
+            magSub.remove();
+            motionSub.remove();
         };
     }, [isTracking]);
 
@@ -54,5 +68,7 @@ export const useTelemetry = (isTracking: boolean): TelemetryData => {
         accelerometer,
         gyroscope,
         magnetometer,
+        rotation,
+        timestamp,
     };
-};
+}

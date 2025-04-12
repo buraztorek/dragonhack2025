@@ -7,13 +7,17 @@ const Skateboard = () => {
     const meshRef = useRef<THREE.Mesh>(null!);
     const { rotation } = useTelemetryStore();
 
-    useFrame((_, delta) => {
-        // Apply gyroscope-based rotation (integrated per frame)
-        meshRef.current.rotation.x += rotation.x * delta;
-        meshRef.current.rotation.y += rotation.y * delta;
-        meshRef.current.rotation.z += rotation.z * delta;
-    });
+    useFrame(() => {
+        // Convert DeviceMotion rotation (ZXY) to Three.js Euler
+        const euler = new THREE.Euler(
+            rotation.y,  // pitch (beta → X)
+            rotation.z,  // roll (gamma → Y)
+            rotation.x,  // yaw (alpha → Z)
+            'ZXY'        // DeviceMotion uses ZXY
+        );
 
+        meshRef.current.setRotationFromEuler(euler);
+    });
 
     return (
         <mesh ref={meshRef}>
