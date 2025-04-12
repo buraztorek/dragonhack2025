@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import uuid
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from logger import log_telemetry
 from broadcaster import add_client, remove_client, broadcast
@@ -16,7 +17,8 @@ latest_frame = {
 @app.websocket("/ws/telemetry")
 async def telemetry_stream(websocket: WebSocket):
     await websocket.accept()
-    print("📱 Telemetry device connected")
+    session_id = str(uuid.uuid4())  # Generate a unique session ID
+    print(f"📱 Telemetry device connected (Session ID: {session_id})")
 
     try:
         while True:
@@ -26,11 +28,12 @@ async def telemetry_stream(websocket: WebSocket):
 
                 # Ensure all expected keys are present
                 if not all(k in data for k in ["accelerometer", "gyroscope", "magnetometer", "rotation"]):
-                    print("⚠️ Incomplete telemetry data, skipping...")
+                    print(f"⚠️ Incomplete telemetry data (Session ID: {session_id}), skipping...")
                     continue
 
                 # Construct a fused frame using the actual rotation from the phone
                 fused = {
+                    "session_id": session_id,  # Include session ID in the data
                     "timestamp": data.get("timestamp", datetime.utcnow().timestamp()),
                     "rotation": {
                         "x": data["rotation"]["alpha"],  # yaw
@@ -49,12 +52,10 @@ async def telemetry_stream(websocket: WebSocket):
                 await broadcast(fused)
 
             except Exception as e:
-                print("❌ Error processing telemetry:", e)
+                print(f"❌ Error processing telemetry (Session ID: {session_id}):", e)
 
     except WebSocketDisconnect:
-        print("📴 Telemetry disconnected")
-
-
+        print(f"📴 Telemetry disconnected (Session ID: {session_id})")
 
 @app.websocket("/ws/viewer")
 async def viewer_stream(websocket: WebSocket):
