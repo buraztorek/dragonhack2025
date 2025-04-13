@@ -1,4 +1,6 @@
-![Lok8 Logo](./lok8/public/logo-pride.png)
+<p align="center">
+  <img src="./lok8/public/logo-pride.png" alt="Lok8 Logo">
+</p>
 
 ## Software for skaters by BurazTorek 🛹
 
