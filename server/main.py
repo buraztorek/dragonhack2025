@@ -25,21 +25,24 @@ async def telemetry_stream(websocket: WebSocket):
             raw = await websocket.receive_text()
             try:
                 data = json.loads(raw)
-                print(data)
+                # print(data)
 
                 if not all(k in data for k in ["accelerometer", "gyroscope", "magnetometer", "rotation"]):
                     print(f"⚠️ Incomplete telemetry data (Session ID: {session_id}), skipping...")
                     continue
 
-                # Convert trick to a dictionary if it's a stringified JSON
-                try:
-                    trick_data = json.loads(data["trick"]) if isinstance(data["trick"], str) else data["trick"]
-                except Exception as e:
-                    print("❌ Could not parse 'trick' field:", e)
-                    trick_data = {"type": "unknown"}
+                # # Convert trick to a dictionary if it's a stringified JSON
+                # try:
+                #     print()
+                #     print(data)
+                #     print()
+                #     trick_data = json.loads(data["trick"]) if isinstance(data["trick"], str) else data["trick"]
+                # except Exception as e:
+                #     print("❌ Could not parse 'trick' field:", e)
+                #     trick_data = {"type": "unknown"}
 
                 fused = {
-                    "session_id": trick_data.get("type", "unknown"),
+                    "session_id": session_id,
                     "timestamp": data.get("timestamp", datetime.utcnow().timestamp()),
                     "rotation": {
                         "x": data["rotation"]["alpha"],
@@ -51,7 +54,8 @@ async def telemetry_stream(websocket: WebSocket):
                     "magneticField": data["magnetometer"]
                 }
 
-                await log_telemetry(fused)
+                skill = await log_telemetry(fused)
+                fused["skill"] = skill
 
                 # Send telemetry data only to viewer clients
                 await broadcast_to_viewers(fused)

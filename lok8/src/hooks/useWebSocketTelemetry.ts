@@ -15,6 +15,7 @@ interface TelemetryStore {
   gyroscope: Vec3;
   magneticField: Vec3;
   timestamp: number;
+  skill: string;
 
   // State & Control
   connectionStatus: ConnectionStatus;
@@ -27,6 +28,7 @@ interface TelemetryStore {
     gyroscope: Vec3;
     magneticField: Vec3;
     timestamp: number;
+    skill: string;
   }) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
   triggerReset: () => void;
@@ -39,6 +41,7 @@ export const useTelemetryStore = create<TelemetryStore>((set) => ({
   gyroscope: { x: 0, y: 0, z: 0 },
   magneticField: { x: 0, y: 0, z: 0 },
   timestamp: 0,
+  skill: '',
 
   // Initial State & Control
   connectionStatus: 'connecting',
@@ -95,7 +98,8 @@ export const useWebSocketTelemetry = (url: string | null) => {
           typeof data.magneticField?.x === 'number' &&
           typeof data.magneticField?.y === 'number' &&
           typeof data.magneticField?.z === 'number' &&
-          typeof data.timestamp === 'number'
+          typeof data.timestamp === 'number' &&
+          typeof data.skill === 'string'
         ) {
           setTelemetry({
             rotation: data.rotation,
@@ -103,6 +107,7 @@ export const useWebSocketTelemetry = (url: string | null) => {
             gyroscope: data.gyroscope,
             magneticField: data.magneticField,
             timestamp: data.timestamp,
+            skill: data.skill,
           });
         } else {
           console.warn("Incomplete or invalid telemetry packet received:", data);
