@@ -123,41 +123,41 @@ const Skateboard = () => {
                 // Set the new display text
                 if (trick !== '') {
                     setDisplayText(trick);
+
+                    // Animate in
+                    let startTime = Date.now();
+                    const animateIn = () => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / 500, 1); // 500ms animation
+
+                        setTextOpacity(progress);
+                        setTextScale(Math.min(1, progress * 1.2)); // Slight overshoot for bounce effect
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animateIn);
+                        } else {
+                            // After animation completes, set timeout to fade out
+                            setTimeout(() => {
+                                // Animate out
+                                startTime = Date.now();
+                                const animateOut = () => {
+                                    const elapsed = Date.now() - startTime;
+                                    const progress = Math.min(elapsed / 800, 1); // 800ms fade out
+
+                                    setTextOpacity(1 - progress);
+
+                                    if (progress < 1) {
+                                        requestAnimationFrame(animateOut);
+                                    } else {
+                                        setDisplayText(null); // Remove text after fade out
+                                    }
+                                };
+                                requestAnimationFrame(animateOut);
+                            }, 5000); // Wait 5 seconds before fading out
+                        }
+                    };
+                    requestAnimationFrame(animateIn);
                 }
-
-                // Animate in
-                let startTime = Date.now();
-                const animateIn = () => {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / 500, 1); // 500ms animation
-
-                    setTextOpacity(progress);
-                    setTextScale(Math.min(1, progress * 1.2)); // Slight overshoot for bounce effect
-
-                    if (progress < 1) {
-                        requestAnimationFrame(animateIn);
-                    } else {
-                        // After animation completes, set timeout to fade out
-                        setTimeout(() => {
-                            // Animate out
-                            startTime = Date.now();
-                            const animateOut = () => {
-                                const elapsed = Date.now() - startTime;
-                                const progress = Math.min(elapsed / 800, 1); // 800ms fade out
-
-                                setTextOpacity(1 - progress);
-
-                                if (progress < 1) {
-                                    requestAnimationFrame(animateOut);
-                                } else {
-                                    setDisplayText(null); // Remove text after fade out
-                                }
-                            };
-                            requestAnimationFrame(animateOut);
-                        }, 5000); // Wait 5 seconds before fading out
-                    }
-                };
-                requestAnimationFrame(animateIn);
             } else {
                 // If the trick has been reset to null, handle appropriately
                 setTextOpacity(0);
@@ -196,7 +196,7 @@ const Skateboard = () => {
     return (
         <>
             {/* Skateboard */}
-            <primitive ref={group} object={scene} scale={0.5} position={[0, 0.3, 0]} />
+            <primitive ref={group} object={scene} scale={0.5} position={[0, 0.8, 0]} />
 
             {/* Fire Text (appears when trick is detected) */}
             {displayText && (

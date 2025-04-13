@@ -40,11 +40,13 @@ def detect_ollie(data_x, data_y, data_z, threshold=0.6):
 	maximum = data_y.max()
 	abs_diff = abs(maximum - minimum)
 	if abs_diff > threshold:
-		if data_z.max() < 0.5 and data_z.min() > -0.5:
+        # no elements in the data_z can be between -0.5 and 0.5. use any() to check this
+		if not ((data_z > -2.5) & (data_z < 2.5)).any():
+			print(data_z)
 			return True
 	return False
 
-def detect_shuvit(data_x, data_y, data_z, threshold=5):
+def detect_shuvit(data_x, data_y, data_z, threshold=2.5):
 	minimum = data_x.min()
 	maximum = data_x.max()
 	abs_diff = abs(maximum - minimum)
@@ -77,8 +79,6 @@ async def log_telemetry(data: dict):
         "rotation_z": data["rotation"]["z"]
     }
     df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
-
-    # print(df.shape)
 
     if df.shape[0] - last_processed_idx > interval:
         last_processed_idx = df.shape[0]
