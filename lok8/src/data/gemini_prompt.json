@@ -1,0 +1,18 @@
+{
+    "contents": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "text": "Generate a short, smart review of a skateboarding session based on this data:\n\n" +
+                    "- Duration: 42 minutes\n" +
+                    "- Tricks attempted: Ollies (performance: good), Shuvits (performance: medium), Kickflips (performance: poor)\n" +
+                    "- Location: Local skate park\n" +
+                    "- Conditions: Sunny weather, dry ground\n" +
+                    "Highlight what went well, areas to improve, and suggest focus for the next session. Keep it casual but insightful, like a coach's feedback."
+          }
+        ]
+      }
+    ]
+  }
+  

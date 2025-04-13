@@ -9,6 +9,7 @@ import { Physics } from "@react-three/rapier";
 import Landing from "@/components/landing";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import AiCoach from "@/components/ai-coach";
 
 // Dynamically load components
 const Skateboard = dynamic(() => import("@/components/skateboard"), { ssr: false });
@@ -22,6 +23,8 @@ export default function Home() {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState("00:00");
+  const [coachPrompt, setCoachPrompt] = useState<string | null>(null);
+
 
   const presenterColors = ["#ec4899", "#3b82f6", "#10b981", "#f97316"];
 
@@ -66,6 +69,21 @@ export default function Home() {
     sendMessage({ type: "session:stop" });
     setSessionStarted(false);
     setShowAnalysis(true);
+
+    // 🧠 Build summary string for the coach
+    const summaryPrompt = `
+  Just finished a session at Burnside Skatepark.
+  
+  - Duration: ${elapsedTime}
+  - Tricks attempted:
+    - Ollies (easy, 85% success)
+    - Shuvits (medium, 78% success)
+    - Kickflips (hard, 65% success)
+  
+  Give quick feedback like a chill skate coach. What went well? What to work on?
+  `;
+
+    setCoachPrompt(summaryPrompt.trim());
   };
 
   const handleReturnHome = () => {
@@ -79,6 +97,7 @@ export default function Home() {
 
   return (
     <div className="w-screen h-screen bg-gray-100 overflow-hidden">
+      <AiCoach sessionSummary={coachPrompt || undefined} autoOpen={!!coachPrompt} />
       <AnimatePresence mode="wait">
         {!sessionStarted && !showAnalysis ? (
           <motion.div
@@ -125,7 +144,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Ollie Card */}
                   <div className={`${cardStyle} overflow-hidden p-0`}>
-                    <img src="/images/ollie.jpg" alt="Ollie" className="w-full h-44 object-cover" />
+                    <img src="/olly.png" alt="Ollie" className="w-full h-44 object-cover" />
                     <div className="p-4 space-y-2">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold text-black">Ollie</h3>
@@ -146,7 +165,7 @@ export default function Home() {
 
                   {/* Shuvit Card */}
                   <div className={`${cardStyle} overflow-hidden p-0`}>
-                    <img src="/images/shuvit.jpg" alt="Shuvit" className="w-full h-44 object-cover" />
+                    <img src="/shove_it.png" alt="Shuvit" className="w-full h-44 object-cover object-[center_70%]" />
                     <div className="p-4 space-y-2">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold text-black">Shuvit</h3>
@@ -168,7 +187,7 @@ export default function Home() {
 
                 {/* Kickflip - Full Width Card Below */}
                 <div className={`${cardStyle} overflow-hidden mt-6 p-0`}>
-                  <img src="/images/kickflip.jpg" alt="Kickflip" className="w-full h-44 object-cover" />
+                  <img src="/kickflip.png" alt="Kickflip" className="w-full h-44 object-cover object-[center_70%]" />
                   <div className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-bold text-black">Kickflip</h3>

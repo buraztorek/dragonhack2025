@@ -1,4 +1,6 @@
-# Lok8 – Software for Skaters by BurazTorek 🛹
+![Lok8 Logo](./lok8/public/logo-pride.png)
+
+## Software for skaters by BurazTorek 🛹
 
 [![Android](https://img.shields.io/badge/platform-Android-green.svg)](https://www.android.com/)
 [![WebSocket](https://img.shields.io/badge/tech-WebSocket-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
