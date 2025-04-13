@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI("AIzaSyC-xOYKDMYRix86ngn8F0b2hKDk016yS90");
+const genAI = new GoogleGenerativeAI("APIKEY");
 
 export const getGeminiResponse = async (userPrompt: string): Promise<string> => {
   const model = genAI.getGenerativeModel({ model: "models/gemini-2.0-flash" });
