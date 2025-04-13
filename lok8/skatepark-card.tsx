@@ -26,9 +26,9 @@ export default function SkateparkCard({ handleStartSession }: SkateparkCardProps
 
   // Sample data - this would normally come from an API
   const skateparkData = {
-    name: "BURNSIDE SKATEPARK",
-    location: "Portland, Oregon",
-    skaterCount: 23,
+    name: "FRI P1 SKATEPARK",
+    location: "Ljubljana, Slovenia",
+    skaterCount: 200,
     isOpen: true,
     openHours: "7:00 AM - 11:00 PM",
     weather: "Partly Cloudy, 22°C",
@@ -129,7 +129,7 @@ export default function SkateparkCard({ handleStartSession }: SkateparkCardProps
 
           {/* Footer with graffiti-style decorative elements */}
           <div className="border-t-[3px] border-black p-3 bg-black text-white text-xs font-medium text-center">
-            SKATE AT YOUR OWN RISK • HELMETS RECOMMENDED • NO BMX AFTER 8PM
+            SKATE AT YOUR OWN RISK • HELMETS RECOMMENDED • NO SLEEP 24H
           </div>
         </Card>
 

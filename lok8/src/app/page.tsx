@@ -72,7 +72,7 @@ export default function Home() {
 
     // 🧠 Build summary string for the coach
     const summaryPrompt = `
-  Just finished a session at Burnside Skatepark.
+  Just finished a session at FRI P1 Skatepark.
   
   - Duration: ${elapsedTime}
   - Tricks attempted:
@@ -133,7 +133,7 @@ export default function Home() {
                 <div className={cardStyle}>
                   <h2 className="text-lg font-bold mb-2">Time & Conditions</h2>
                   <p>Session Time: <strong>{elapsedTime}</strong></p>
-                  <p>Location: Burnside Skatepark</p>
+                  <p>Location: FRI P1</p>
                   <p>Weather: Partly Cloudy, 22°C</p>
                 </div>
               </div>
@@ -262,22 +262,24 @@ export default function Home() {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                   <div>
                     <h2 className="text-xl font-extrabold text-black uppercase tracking-wide mb-1">
-                      Burnside Skatepark
+                      FRI P1 SKATEPARK
                     </h2>
-                    <p className="text-md text-gray-700 font-medium">Portland, Oregon</p>
+                    <p className="text-md text-gray-700 font-medium">Ljubljana, Slovenia</p>
                   </div>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
-                    <div>
-                      <p className="text-sm text-gray-500">Session Time</p>
-                      <p className="text-3xl font-bold text-black">{elapsedTime}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Status</p>
-                      <p className="text-lg font-semibold text-green-600">Active</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Board</p>
-                      <p className="text-lg font-semibold text-green-500">Connected</p>
+                    <div className="flex flex-wrap gap-4">
+                        <div className="bg-gray-200 text-black text-sm font-semibold px-4 py-2 rounded-md shadow-md border-2 border-black">
+                        <span className="text-gray-500">Session Time: </span>
+                        <span className="text-black">{elapsedTime}</span>
+                        </div>
+                        <div className="bg-green-100 text-green-600 text-sm font-semibold px-4 py-2 rounded-md shadow-md border-2 border-black">
+                        <span className="text-gray-500">Status: </span>
+                        <span className="text-green-600">Shredding</span>
+                        </div>
+                        <div className="bg-green-100 text-green-500 text-sm font-semibold px-4 py-2 rounded-md shadow-md border-2 border-black">
+                      <span className="text-gray-500">Board: </span>
+                      <span className="text-green-500">Connected</span>
+                      </div>
                     </div>
                   </div>
                   <div className="mt-2 md:mt-0">
