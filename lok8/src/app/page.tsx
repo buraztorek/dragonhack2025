@@ -3,15 +3,19 @@
 import dynamic from 'next/dynamic';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
-import { useWebSocketTelemetry } from '../hooks/useWebSocketTelemetry';
-import Landing from '@/components/landing';
+// Import the hook and store action
+import { useWebSocketTelemetry, useTelemetryStore } from '../hooks/useWebSocketTelemetry';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+// Import Physics and Debug
+import { Physics } from '@react-three/rapier';
 
 const Skateboard = dynamic(() => import('@/components/skateboard'), { ssr: false });
 
 export default function Home() {
   const { sendMessage } = useWebSocketTelemetry("ws://localhost:8000/ws/viewer");
+  // Get the reset trigger function from the store
+  const triggerReset = useTelemetryStore((state) => state.triggerReset);
   const [activeButton, setActiveButton] = useState<string | null>(null);
 
   const handleSendMessage = (trick: string) => {
@@ -24,18 +28,42 @@ export default function Home() {
     }
   };
 
+  const handleResetPosition = () => {
+    console.log("Resetting position...");
+    triggerReset(); // Call the reset function from the store
+  };
+
   return (
     <>
-      {/* <Landing /> */}
+      <div style={{ width: '100vw', height: '100vh', background: '#111', position: 'relative' }}>
+        <Canvas camera={{ position: [5, 3, 5], fov: 60 }} shadows>
+          <ambientLight intensity={0.4} />
+          <directionalLight
+            position={[5, 8, 5]}
+            intensity={1.2}
+            castShadow
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+          />
 
-      <div style={{ width: '100vw', height: '100vh', background: '#000', position: 'relative' }}>
-        <Canvas camera={{ position: [5, 3, 5], fov: 60 }}>
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={1} />
-          <Skateboard />
+          {/* <Physics gravity={[0, -9.81, 0]}> */}
+            <Skateboard />
+          {/* </Physics> */}
+
           <OrbitControls />
           <Environment preset="sunset" />
         </Canvas>
+
+        {/* --- UI Buttons --- */}
+         {/* Reset Button */}
+         <Button
+          onClick={handleResetPosition}
+          style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10 }}
+        >
+          Reset Position
+        </Button>
+
+        {/* Trick Buttons */}
         <Button
           onClick={() => handleSendMessage("ollie")}
           disabled={activeButton !== null && activeButton !== "ollie"}
